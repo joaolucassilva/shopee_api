@@ -695,4 +695,179 @@ class Client
         $url = $this->defaultBaseUrl . $path . '?' . $query;
         return $this->sendCurl($url, 'POST', $params);
     }
+
+    /**
+     * Rotina para buscar os detalhes de pagamento de determinado pedido.
+     * Payment API
+     * Get the payout detail for CB.
+     * URL:https://partner.shopeemobile.com/api/v2/payment/get_payout_detail
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/payment/get_payout_detail
+     * @method GET
+     */
+    public function getPayoutDetail($params)
+    {
+        $path = '/api/v2/payment/get_payout_detail';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $paramsQuery = [
+            'page_size' => $params['page_size'],
+            'page_no' => $params['page_no'],
+            'payout_time_from' => $params['payout_time_from'],
+            'payout_time_to' => $params['payout_time_to'],
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+        ];
+
+        $query = http_build_query($paramsQuery);
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'GET');
+    }
+
+    /**
+     * Rotina para obter o parâmetro de envio de determinada
+     * Logistics API
+     * Use this api to get shipping parameter.
+     * URL:https://partner.shopeemobile.com/api/v2/logistics/get_shipping_parameter
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/logistics/get_shipping_parameter
+     * @method GET
+     */
+    public function getShippingParameter($orderId)
+    {
+        $path = '/api/v2/logistics/get_shipping_parameter';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $query = http_build_url(
+            [
+                'order_sn' => $orderId,
+                'partner_id' => $this->partnerId,
+                'timestamp' => $timestamp,
+                'access_token' => $this->accessToken,
+                'shop_id' => $this->shopId,
+                'sign' => $sign,
+            ]
+        );
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'GET');
+    }
+
+    /**
+     * Rotina para buscar e obter o número de rastreamento de uma venda ao enviar.
+     * Logistics API
+     * Use this api to get tracking_number when you have shipped order.
+     * URL:https://partner.shopeemobile.com/api/v2/logistics/get_tracking_number
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/logistics/get_tracking_number
+     * @method GET
+     */
+    public function getTrackingNumber($params)
+    {
+        $path = '/api/v2/logistics/get_tracking_number';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $paramsQuery = [
+            'order_sn' => $params['order_sn'],
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+        ];
+
+        if (!empty($params['package_number'])) {
+            $paramsQuery['package_number'] = $params['package_number'];
+        }
+
+        if (!empty($params['response_optional_fields'])) {
+            $paramsQuery['response_optional_fields'] = $params['response_optional_fields'];
+        }
+
+        $query = http_build_query($paramsQuery);
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'GET');
+    }
+
+    /**
+     * Rotina para obter as informações do envio, status do envio.
+     * Logistics API
+     * Use this api to get the logistics tracking information of an order
+     * URL:https://partner.shopeemobile.com/api/v2/logistics/get_tracking_info
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/logistics/get_tracking_info
+     * @method GET
+     */
+    public function getTrackingInfo($params)
+    {
+        $path = '/api/v2/logistics/get_tracking_info';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $paramsQuery = [
+            'order_sn' => $params['order_sn'],
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+        ];
+
+        if (!empty($params['package_number'])) {
+            $paramsQuery['package_number'] = $params['package_number'];
+        }
+
+        $query = http_build_query($paramsQuery);
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'GET');
+    }
+
+    /**
+     * Rotina para obtenção da etiqueta para impressão do envio da venda.
+     * Logistics API
+     * Use this api to get the logistics tracking information of an order
+     * URL:https://partner.shopeemobile.com/api/v2/logistics/get_shipping_document_info
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/logistics/get_shipping_document_info
+     * @method GET
+     */
+    public function getShippingDocumentInfo($params)
+    {
+        $path = '/api/v2/logistics/get_shipping_document_info';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $paramsQuery = [
+            'order_sn' => $params['order_sn'],
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+        ];
+
+        if (!empty($params['package_number'])) {
+            $paramsQuery['package_number'] = $params['package_number'];
+        }
+
+        $query = http_build_query($paramsQuery);
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'GET');
+    }
+
 }

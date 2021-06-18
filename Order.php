@@ -53,3 +53,12 @@ $params = [
 ];
 
 $client->setNoteOrder($params);
+
+// Rotina para buscar os detalhes de pagamento de determinado pedido.
+$params = [
+    'page_size' => 1,
+    'page_no' => 1,
+    'payout_time_from' => time(),
+    'payout_time_to' => time(),
+];
+$client->getPayoutDetail($params);

@@ -1,15 +1,7 @@
 <?php
 
-require 'Client.php';
+require 'Logistics.php';
 
-$client = new Client();
+$shipping = new Logistics();
 
-//$client->authorization();
-//$client->getToken();
-//$client->refreshAccessToken('97be4bbd9645c4161b9a1cadb391009f');
-
-
-/*$parameters = [
-    'image' => __DIR__ . '/images/teste1.png'
-];
-$client->uploadImage($parameters);*/
+$shipping->getShippingParameter('201214JASXYXY6');

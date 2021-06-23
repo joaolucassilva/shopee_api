@@ -1,64 +1,206 @@
 <?php
 
-require 'Client.php';
+include "AbstractShoppe.php";
 
-$client = new Client();
+class Order extends AbstractShoppe
+{
+    /**
+     * Rotina para Buscar Lista de Vendas.
+     * Order API
+     * Use this api to search orders.
+     * URL:https://partner.shopeemobile.com/api/v2/order/get_order_list
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/get_order_list
+     * @method GET
+     */
+    public function getOrderList($params)
+    {
+        $path = '/api/v2/order/get_order_list';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
 
-// BUSCAR LISTA DE VENDAS
-$params = [
-    'time_range_field' => 'create_time',
-    'time_from' => '1607235072',
-    'time_to' => '1608271872',
-    'page_size' => 20,
-];
+        $paramsQuery = [
+            'shop_id' => $this->shopId,
+            'partner_id' => $this->partnerId,
+            'access_token' => $this->accessToken,
+            'sign' => $sign,
+            'timestamp' => $timestamp,
+            'time_range_field' => $params['time_range_field'],
+            'time_from' => $params['time_from'],
+            'time_to' => $params['time_to'],
+            'page_size' => $params['page_size'],
+        ];
 
-$client->getOrderList($params);
+        if (!empty($params['cursor'])) {
+            $paramsQuery['cursor'] = $params['cursor'];
+        }
 
-// BUSCAR LISTA DE VENDAS PRONTAS PARA ENVIO
-$params = [
-    'page_size' => 20
-];
-$client->getOrderShipmentList($params);
+        if (!empty($params['order_status'])) {
+            $paramsQuery['order_status'] = $params['order_status'];
+        }
 
-// DETALHES DA VENDA
-$params = [
-    'order_sn_list' => '201214JAJXU6G7,201214JASXYXY6'
-];
-$client->getOrderDetail($params);
+        if (!empty($params['response_optional_fields'])) {
+            $paramsQuery['response_optional_fields'] = $params['response_optional_fields'];
+        }
 
-// CANCELAR VENDA
-$params = [
-    'order_sn' => '201020SQQ5K2EP', // REQUIRED
-    'cancel_reason' => 'OUT_OF_STOCK', // REQUIRED
-    'item_list' => [
-        'item_id' => 1680783, // REQUIRED
-        'model_id' => 327890123 // REQUIRED
-    ]
-];
+        $url = $this->defaultBaseUrl . $path . '?' . http_build_query($paramsQuery);
+        return $this->sendCurl($url, 'GET');
+    }
 
-$client->cancelOrder($params);
+    /**
+     * Rotina para Buscar Lista de Vendas Prontas para Envio
+     * Order API
+     * Use this api to get order list which order_status is READY_TO_SHIP
+     * URL:https://partner.shopeemobile.com/api/v2/order/get_shipment_list
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/get_shipment_list
+     * @method GET
+     */
+    public function getOrderShipmentList($params)
+    {
+        $path = '/api/v2/order/get_shipment_list';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
 
-// ACEITAR CANCELAMENTO DE COMPRA
-$params = [
-    'order_sn' => '201020SQQ5K2EP', // REQUIRED (Shopee's unique identifier for an order.)
-    'operation' => 'ACCEPT' // REQUIRED (The operation you want to handle.Avaiable value: ACCEPT, REJECT)
-];
+        $queryParams = [
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+            'page_size' => $params['page_size']
+        ];
 
-$client->handleBuyerCancelledOrder($params);
+        if (!empty($params['cursor'])) {
+            $queryParams['cursor'] = $params['cursor'];
+        }
 
-// ANOTAÇÕES NA VENDA
-$params = [
-    'order_sn' => '201224EM1FMFG1',
-    'note' => 'Thank you'
-];
+        $url = $this->defaultBaseUrl . $path . '?' . http_build_query($queryParams);
+        return $this->sendCurl($url, 'GET');
+    }
 
-$client->setNoteOrder($params);
+    /**
+     * Rotina para Buscar Detalhes da Venda
+     * Order API
+     * Use this api to get order detail.
+     * URL:https://partner.shopeemobile.com/api/v2/order/get_order_detail
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/get_order_detail
+     * @method GET
+     */
+    public function getOrderDetail($params)
+    {
+        $path = '/api/v2/order/get_order_detail';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
 
-// Rotina para buscar os detalhes de pagamento de determinado pedido.
-$params = [
-    'page_size' => 1,
-    'page_no' => 1,
-    'payout_time_from' => time(),
-    'payout_time_to' => time(),
-];
-$client->getPayoutDetail($params);
+        $queryParams = [
+            'partner_id' => $this->partnerId,
+            'timestamp' => $timestamp,
+            'access_token' => $this->accessToken,
+            'shop_id' => $this->shopId,
+            'sign' => $sign,
+            'order_sn_list' => $params['order_sn_list']
+        ];
+
+        if (!empty($params['response_optional_fields'])) {
+            $queryParams['response_optional_fields'] = $params['response_optional_fields'];
+        }
+
+        $url = $this->defaultBaseUrl . $path . '?' . http_build_query($queryParams);
+        return $this->sendCurl($url, 'GET');
+    }
+
+    /**
+     * Rotina para Cancelar Venda
+     * Order API
+     * Use this api to cancel an order
+     * URL:https://partner.shopeemobile.com/api/v2/order/cancel_order
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/cancel_order
+     * @method POST
+     */
+    public function cancelOrder($params)
+    {
+        $path = '/api/v2/order/cancel_order';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $query = http_build_query(
+            [
+                'partner_id' => $this->partnerId,
+                'timestamp' => $timestamp,
+                'access_token' => $this->accessToken,
+                'shop_id' => $this->shopId,
+                'sign' => $sign,
+            ]
+        );
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'POST', $params);
+    }
+
+    /**
+     * Rotina Aceitar Cancelamento de Compra
+     * Order API
+     * Use this api to handle buyer's cancellation application
+     * URL:https://partner.shopeemobile.com/api/v2/order/handle_buyer_cancellation
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/handle_buyer_cancellation
+     * @method POST
+     */
+    public function handleBuyerCancelledOrder($params)
+    {
+        $path = '/api/v2/order/handle_buyer_cancellation';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $query = http_build_query(
+            [
+                'partner_id' => $this->partnerId,
+                'timestamp' => $timestamp,
+                'access_token' => $this->accessToken,
+                'shop_id' => $this->shopId,
+                'sign' => $sign,
+            ]
+        );
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'POST', $params);
+    }
+
+    /**
+     * Rotina para setar Anotações na Venda
+     * Order API
+     * Use this api to set note for an order
+     * URL:https://partner.shopeemobile.com/api/v2/order/set_note
+     * URL Test: https://partner.test-stable.shopeemobile.com/api/v2/order/set_note
+     * @method POST
+     */
+    public function setNoteOrder($params)
+    {
+        $path = '/api/v2/order/set_note';
+        $timestamp = time();
+        $sign = $this->signatureGenerator->generateSignature(
+            $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId
+        );
+
+        $query = http_build_query(
+            [
+                'partner_id' => $this->partnerId,
+                'timestamp' => $timestamp,
+                'access_token' => $this->accessToken,
+                'shop_id' => $this->shopId,
+                'sign' => $sign,
+            ]
+        );
+
+        $url = $this->defaultBaseUrl . $path . '?' . $query;
+        return $this->sendCurl($url, 'POST', $params);
+    }
+}

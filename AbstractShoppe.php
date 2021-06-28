@@ -26,8 +26,6 @@ abstract class AbstractShoppe
 
     public $refreshToken;
 
-    public $image;
-
     public function __construct()
     {
         $this->defaultBaseUrl = 'https://partner.test-stable.shopeemobile.com';
@@ -148,4 +146,9 @@ abstract class AbstractShoppe
         return true;
     }
 
+    public function generateSignature($path, $timestamp)
+    {
+        $sign = $this->partnerId . $path . $timestamp . $this->accessToken . $this->shopId;
+        return hash_hmac('sha256', $sign, $this->partnerKey);
+    }
 }

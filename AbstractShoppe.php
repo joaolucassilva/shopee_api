@@ -25,15 +25,15 @@ abstract class AbstractShoppe
     public $accessToken;
 
     public $refreshToken;
-
+    
     public function __construct()
     {
         $this->defaultBaseUrl = 'https://partner.test-stable.shopeemobile.com';
-        $this->partnerKey = 'de4f6b273e329fb86b56779a86e2d902cc665fc372fb89a5ee420b182d765656';
-        $this->partnerId = 1000624;
-        $this->shopId = 5934;
-        $this->accessToken = '32fd7c6ad8fb9c1f5e822f592fa3c64d';
-        $this->refreshToken = '0ed1b74374541317794befcfb1dd14f2';
+        $this->partnerKey = 'PARTNER KEY';
+        $this->partnerId = 'PARTNER ID';
+        $this->shopId = 'SHOP ID';
+        $this->accessToken = 'ACCESS TOKEN';
+        $this->refreshToken = 'REFRESH TOKEN';
 
         $this->signatureGenerator = new SignatureGenerator($this->partnerKey);
     }
